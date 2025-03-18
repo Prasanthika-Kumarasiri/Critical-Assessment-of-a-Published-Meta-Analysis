@@ -8,6 +8,7 @@ output: html_document
 load metafor package
 
 ```{r, message=FALSE}
+install.packages("metafor")
 library(metafor)
 ```
 
