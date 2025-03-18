@@ -1,0 +1,508 @@
+---
+title: "A3"
+author: "Prasanthika Kumarasiri."
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+load metafor package
+
+```{r, message=FALSE}
+library(metafor)
+```
+
+==================================================================
+## **Extract data tables**
+==================================================================
+
+### Create data frame for Table 1 of Zinellu & Mangoni (2024) and export to .csv file.
+
+```{r}
+# Selected variables copied from Table 1:
+# Characteristics of the studies reporting serum amyloid a concentrations in patients with rheumatic diseases and healthy controls
+Study_Name1 <- c("Aygündüz et al.","Tanimoto et al.",
+                 "Wong et al.","Jung et al.", 
+                 "Karadag et al.","Sato et al. (a)",
+                 "Sato et al. (b)","Rho et al.",
+                 "Ma et al.","Rooney et al.",
+                 "He et al.","Londono et al.",
+                 "de Seny et al. (a)","de Seny et al.(b)",
+                 "Giese et al.","Lakota et al.",
+                 "Shen et al. (a)","Shen et al. (b)",
+                 "Shen et al. (c)","Botta et al.",
+                 "Ciftci et al.","Gaál K et al.",
+                 "Uslu AU et al.","Fentoglu et al.",
+                 "Nair et al.","Lis-Swiety et al.",
+                 "Bezuidenhout et al.","van Sleen et al.",
+                 "Yuan et al. (a)","Yuan et al. (b)",
+                 "Yuan et al. (c)","Can Sandikci et al.",
+                 "Ciregia et al.","Hu et al.",
+                 "Luo et al.","Sweet et al.",
+                 "El Kosaier et al.","Zhou et al.")
+
+Continent <- c('Asia','Asia','Oceania','Asia','Asia','Asia',
+               'Asia','America','Asia','America','Asia','America',
+               'Europe','Europe','Europe','Europe','Asia','Asia',
+               'Asia','America','Asia','Europe','Asia','Asia','Asia',
+               'Europe','Africa','Europe','Asia','Asia','Asia','Asia',
+               'Asia','Asia','Asia','America','Africa','Asia')
+
+
+year <- c(2002,2003,2003,2007,2007,2007,2007,2009,2010,2011,
+         2012,2012,2013,2013,2014,2015,2014,2014,2014,2016,
+         2016,2016,2016,2017,2017,2018,2020,2020,2020,2020,
+         2020,2021,2021,2021,2021,2021,2023,2023)
+
+n1 <- c(43,25,53,38,25,14,25,169,43,105,70,62,29,27,30,
+       129,88,43,54,44,50,51,40,109,99,33,30,29,25,25,
+       25,54,100,78,80,300,60,61)
+
+male.female_ratioRD <- c(22/21, 2/23, 1, 26/12, 0/25,
+                       0/14, 0/25, 52/117, 5/38, 17/88,
+                       1, 43/19, 1, 1, 
+                       14/16, 20/109, 23/65, 12/31, 12/42, 
+                       5/39, 9/41,7/44, 11/29, 47/62, 23/76,
+                       9/24,6/24, 11/18, 5/20, 5/20, 5/20,
+                       27/37, 20/80, 50/28, 4/76, 154/146,
+                       11/49, 0) 
+mean1_RD <- c(220,63,19.8,9.52,38.8,12.3,10.7,5.3,76.4,
+             7.4,68.72,853.7,1.57,2.42,3.14,32.39,6.15,
+             2.54,1.42,8.0,2126.5,19017.07,25.2,18.51,
+             140,62.3,8.6,197,117.64,50.74,6.82,9.21,
+             4.64,39.65,91.7,22.89,35.1,56.7)
+sd1 <- c(51,122,27.5,7.49,24,9,8.7,7.1,47.7,7.0,48.77,
+        946.2,0.29,0.91,4.82,85.89,3.27,0.31,0.97,6.5,
+        1876.34,25899.25,45.78,1.17,69.8,23.2,12.8,397,
+        107.37,74.16,91.59,16.85,0.71,14.23,24.29,2.28,
+        3.6,94.3)
+
+n2 = c(27,25,53,38,22,17,22,92,20,62,20,46,35,35,37,98,
+       50,50,50,33,37,49,40,128,40,11,25,33,25,25,25,
+       28,100,80,40,34,60,20)
+
+male.female_ratioCTRL <- c(14/13, 2/23, 1, 25/13, 0/22,
+                          0/17, 0/22, 34/58, 2/18, 31/31, 1,
+                          0, 15/20, 15/20, 17/20, 64/34, 12/38,
+                          12/38, 12/38, 726, 7/30, 8/41, 12/28,
+                          54/74, 12/28, 1, 8/17, 11/22,
+                          5/20, 5/20, 5/20, 16/12, 20/80, 51/29,
+                          2/38, 16/18, 13/47, 0)
+
+mean2_CTRL <- c(50,9,4.8,2.73,19.6,2.68,3.63,1.83,23.9,
+               3.53,2.68,282.49,1.31,1.31,0.37,7.29,
+               1.45,1.45,1.45,6.7,1154.78,2666.05,1.68,
+               2.82,96.6,18.97,2.37,5.67,4.9,4.25,5.16,
+               1.81,4.22,7.64,54.6,21.1,1.6,2.13)
+sd2 <- c(23,9,3.7,1.57,7.5,0.44,1.47,1.35,37.1,3.42,1.56,
+        371.94,0.44,0.44,0.26,19.17,0.72,0.72,0.72,5.5,
+        1375.15,2301.11,0.63,0.23,66.7,18.57,3.72,10.2,
+        1.96,1.16,2.61,1.81,0.49,1.32,18.8,1.15,0.12,0.89)
+
+
+Disease_type1 <- c('BD','RA','RA','AS','SLE','SLE','SLE',
+                 'RA','TA','RA','HSP','SpA','OA','RA',
+                 'FMF','SSc','RA','SLE','OA','RA','FMF',
+                 'SLE','FMF','FMF','TA','SSc','RA','PMR',
+                 'RA','RA','RA','FMF','RA','AS','TA','PsA',
+                 'RA','Gout')
+
+male.female_ratioRD.CTR <-round((male.female_ratioRD/male.female_ratioCTRL),4)
+
+# Replace Inf, -Inf, and NaN with 0
+
+male.female_ratioRD.CTR[is.infinite(male.female_ratioRD.CTR) | is.nan(male.female_ratioRD.CTR)] <- 0
+
+
+# create data frame for table 1
+table_1 <- data.frame (
+  Study_Name1,
+  Continent,
+  year,
+  n1,
+  male.female_ratioRD,
+  mean1_RD,
+  sd1,
+  n2,
+  male.female_ratioCTRL,
+  mean2_CTRL,
+  sd2,
+  Disease_type1,
+  male.female_ratioRD.CTR
+)
+
+# Inspect data frame
+View (table_1)
+
+str(table_1)
+
+# Write the data frame to a CSV file
+write.csv(table_1, file = "table_1.csv", row.names = FALSE)
+```
+
+
+### Create data frame for Table 3 of Zinellu & Mangoni (2024) and export to .csv file.
+
+```{r}
+# Selected variables copied from Table 3:
+# Characteristics of studies reporting serum amyloid A concentrations in patients with rheumatic diseases with active disease and remission
+
+Study_Name3 <- c("Aygündüz et al.","Ma et al.","Botta et al.",
+               "Nair et al.","Hu et al.","Luo et al.",
+               "El Kosaier et al.","Zhou et al.")
+Year <- c(2002, 2010, 2016, 2017, 2021, 2021, 2023, 2023)
+
+n1_activeRD <- c(20,18,27,43,42,40,50,34)
+
+male.female_ratio_activeRD <- c(14/6, 2/16, 2/25, 14/29,
+                               "NR", 2/38, "NR", "NR")
+
+mean1_activeRD <- c(296,95.9,8.7,175,56.18,104.7,41.8,97.25)
+
+sd1_activeRD <- c(92,38.4,6.8,64,17.25,25.28,2.9,164.8)
+
+n2_remissionRD <- c(23,25,17,48,36,40,10,27)
+
+male.female_ratio_remissionRD <- c(8/15, 3/22, 3/14, 9/39,
+                                  "NR", 2/38, "NR","NR")
+
+mean2_remissionRD <- c(153,49.2,6.8,103,20.36,78.7,1.4,5.73)
+
+sd2_remissionRD <- c(41,60.7,5.87,45,5.36,23.3,0.16,5.43)
+
+Disease_type3 <- c('BD','TA','RA','TA','AS','TA','RA','Gout')
+
+# create data frame for table 3
+table_3 <- data.frame (
+  Study_Name3,
+  Year,
+  n1_activeRD,
+  male.female_ratio_activeRD,
+  mean1_activeRD,
+  sd1_activeRD,
+  n2_remissionRD,
+  male.female_ratio_remissionRD,
+  mean2_remissionRD,
+  sd2_remissionRD,
+  Disease_type3
+)
+
+# Inspect data frame
+View (table_3)
+str(table_3)
+
+# Write the data frame to a CSV file
+write.csv(table_3, file = "table_3.csv", row.names = FALSE)
+```
+
+==================================================================
+## **Meta analysis and forest plot for SMD and RE model with REML estimator**
+==================================================================
+
+
+```{r}
+# Calculate effects.
+ma_effects <- escalc(
+  measure = "SMD", # Calculate standardised mean difference.
+  n1i = n1, # Specify size of RD sample.
+  n2i = n2, # Specify size of CTRL sample.
+  m1i = mean1_RD, # Specify mean of RD sample.
+  m2i = mean2_CTRL, # Specify mean of CTRL sample.
+  sd1i = sd1, # Specify sd of RD sample.
+  sd2i = sd2,# Specify sd of CTRL sample.
+  slab = Study_Name1, # study lable
+  data = table_1 # Specify variables’ data frame.
+)
+
+
+```
+
+```{r}
+# meta analysis
+rma_results <- rma(data = ma_effects, yi = yi , vi = vi)
+
+summary(rma_results)
+
+# forest plot
+forest(rma_results)
+```
+
+
+==================================================================
+## **Sensitivity analysis** 
+==================================================================
+
+
+
+
+```{r}
+#list of  τ estimators
+τ_estimator <- c("DL", "HE", "HS",  "ML", "REML" )
+
+# initiate empty vectors for estimates
+Estimated_SMD <- c()
+
+LCI <- c()
+
+UCI <- c()
+
+τ <- c()
+ 
+I2 <- c()
+
+
+# calculate meta estimates for different REM estimators and append calculated values to above vectors
+for (mtd in  τ_estimator) {
+  rma_results <- rma(data = ma_effects, yi = yi , vi = vi, method = mtd)
+  Estimated_SMD <- append(Estimated_SMD, round(rma_results$b[,1],2))
+  LCI <- append(LCI, round(rma_results$ci.lb,2))
+  UCI <- append(UCI, round(rma_results$ci.ub,2))
+  τ <- append( τ,round(sqrt(rma_results$tau2),2))
+  I2 <- append(I2, round(rma_results$I2,2))
+  
+ }
+
+# Create a summary table
+summary_table <- data.frame(
+  τ_estimator =  τ_estimator,
+  Estimated_SMD = Estimated_SMD,
+  LCI = LCI,
+  UCI = UCI,
+  τ =  τ,
+  I2 = I2
+)
+
+print( summary_table)
+
+
+```
+
+The meta estimate and associated confidence interval obtained with DerSimonian-Laird (DL) estimator was closely matched to those reported in their results. Moreover, it is reasonable to assume that they have used DL method for random effect estimator given its popularity. 
+
+==================================================================
+## **Replication of main findings **
+==================================================================
+
+**Replicate meta analysis and fig.2 "Forest plot for studies reporting serum amyloid A concentrations in patients with rheumatic diseases and healthy controls"**
+
+
+```{r}
+
+# meta analysis with DL estimator
+rma_res <- rma(data = ma_effects, yi = yi , vi = vi, method = "DL")
+
+summary(rma_res)
+
+# function to add Q-test, I^2, and tau^2 estimate info
+mlabfun <- function(text, x) {
+  list(bquote(paste(.(text),
+  " (Q = ", .(fmtx(x$QE, digits=2)),
+  ", df = ", .(x$k - x$p), ", ",
+  .(fmtp(x$QEp, digits=3, pname="p", add0=TRUE, sep=TRUE, equal=TRUE)), "; ",
+  I^2, " = ", .(fmtx(x$I2, digits=1)), "%)")))}
+
+
+
+
+# forest plot with extra annotations
+
+forest(rma_res,  
+       ilab.xpos=c(-9.5,-8,-6,-4.5), cex=0.5, 
+       header="Study", 
+       mlab=mlabfun("RE Model", rma_res))
+
+```
+**Meta analysis after removing studies with SMD over  5**
+
+```{r}
+# meta analysis with DL estimator
+rma_res.1 <- rma(data = ma_effects, subset = yi < 5 , yi = yi , vi = vi, method = "DL")
+
+summary(rma_res.1)
+```
+
+
+**Assessing publication bias with Funnel plot and Egger's test**
+
+```{r}
+funnel(rma_res)
+
+# Egger's test for publication bias after removing two studies with SMD over 5
+egger_test <- regtest(rma_res.1)
+
+egger_test
+```
+
+**Replicate fig.12 "Forest plot of studies reporting serum amyloid A concentrations in patients with rheumatic diseases with active disease and patients in remission"**
+
+```{r}
+# Calculate effects.
+ma_effects.2 <- escalc(
+  measure = "SMD", # Calculate standardised mean difference.
+  n1i = n1_activeRD, # Specify size of RD active sample.
+  n2i = n2_remissionRD, # Specify size of remission sample.
+  m1i = mean1_activeRD, # Specify mean of RD active sample.
+  m2i = mean2_remissionRD, # Specify mean of remission sample.
+  sd1i = sd1_activeRD, # Specify sd of RD active sample.
+  sd2i = sd2_remissionRD,# Specify sd of remission sample.
+  slab = Study_Name3, # study labels
+  data = table_3 # Specify variables’ data frame.
+)
+
+# meta analysis with DL estimator
+rma_res.2 <- rma(data = ma_effects.2, yi = yi , vi = vi, method = "DL")
+
+summary(rma_res.2)
+
+# function to add Q-test, I^2, and tau^2 estimate info
+mlabfun <- function(text, x) {
+  list(bquote(paste(.(text),
+  " (Q = ", .(fmtx(x$QE, digits=2)),
+  ", df = ", .(x$k - x$p), ", ",
+  .(fmtp(x$QEp, digits=3, pname="p", add0=TRUE, sep=TRUE, equal=TRUE)), "; ",
+  I^2, " = ", .(fmtx(x$I2, digits=1)), "%)")))}
+
+
+
+
+# forest plot with extra annotations
+
+forest(rma_res.2,  
+       ilab.xpos=c(-9.5,-8,-6,-4.5), cex=0.5, 
+       header="Study", 
+       mlab=mlabfun("RE Model", rma_res.2))
+```
+
+
+**Meta-regression analysis for male-to-female ratio between RD and healthy control moderator using the DL estimator.**
+
+```{r}
+reg.res <- rma(yi = yi, vi = vi, subset = yi < 5 & male.female_ratioRD.CTR != 0, mods = ~ male.female_ratioRD.CTR , method = "DL", data=ma_effects) # removes observations with extreme SMD values and male-to-female ratio between RD and healthy control is zero.
+
+summary(reg.res)
+```
+**Meta-regression resulted significant association between the effect size and male to female ratio (z = 2.0059, p = 0.0449)** 
+
+
+**Subgroup analysis, bubble plot for meta regression, and leave one out forest plots were performed in STATA**
+
+
+
+==================================================================
+## **Limitations and Extensions**
+==================================================================
+
+
+**Test for assumption of equal variances**
+
+```{r}
+
+# sample sizes
+n1 <- table_1$n1
+n2 <- table_1$n1
+
+# sample variances
+v1 <- table_1$sd1^2
+v2 <- table_1$sd2^2
+
+
+nu.1 <- n1 - 1
+nu.2 <- n2 - 1
+
+# log of ratios of variances and variance of log ratios
+log.ratios <- log(v1/v2)
+v.log.ratios <- 2*(nu.1 + nu.2 - 2)/nu.1/(nu.2 - 4)
+
+# bias adjustment
+log.ratios.adj <- log.ratios - log(nu.2/(nu.2 - 2)) + v.log.ratios/2
+
+# set the Hedges (REML) estimator to estimate the random effect variance
+method <- "REML"
+
+# meta analysis
+res <- rma(yi = log.ratios.adj, vi = v.log.ratios, method = method)
+
+summary(res)
+
+```
+
+
+
+*The estimated log variance ratio is 3.4344 with associated 95% confidence interval (2.5091,  4.3597). This estimate is significantly different than zero. Therefore, we have statistical evidence to suggest that sample variances are significantly different among given studies.In addition, the test for heterogeneity is significant (p-value < 0.001). Therefore, we  have evidence of heterogeneity among studies.* 
+
+*The SMD assumes that the variances of two arms are equal for all studies. We have found evidence to suggest otherwise. Therefore, use of SMD for meta-analysis in this scenario is not recommended.*
+
+*On contrast, log Ratio of Mean (log RoM) does not require equal variance assumption.*
+
+
+
+==================================================================
+
+
+**Meta-analysis with log RoM**
+
+
+```{r}
+# Calculate effects.
+lg.rom_effects <- escalc(
+  measure = "ROM", # Calculate standardised mean difference.
+  n1i = n1, # Specify size of RD sample.
+  n2i = n2, # Specify size of CTRL sample.
+  m1i = mean1_RD, # Specify mean of RD sample.
+  m2i = mean2_CTRL, # Specify mean of CTRL sample.
+  sd1i = sd1, # Specify sd of RD sample.
+  sd2i = sd2,# Specify sd of CTRL sample.
+  slab = Study_Name1,# study labels
+  data = table_1 # Specify variables’ data frame.
+)
+
+# add standard error column to data frame
+lg.rom_effects$se <- sqrt(lg.rom_effects$vi)
+
+
+# Write the data frame to a CSV file
+write.csv(lg.rom_effects, file = "lg_rom_effects.csv", row.names = FALSE)
+
+```
+
+
+
+```{r}
+# meta analysis with REML estimator
+lg.rom_res <- rma(data = lg.rom_effects, yi = yi , vi = vi)
+
+summary(lg.rom_res)
+
+
+
+# forest plot in log scale with extra annotations
+
+forest(lg.rom_res, 
+       ilab.xpos=c(-9.5,-8,-6,-4.5), cex=0.5, 
+       header="Study", 
+       mlab=mlabfun("RE Model", lg.rom_res))
+
+
+# forest plot in ratio scale with extra annotations
+
+forest(lg.rom_res, transf = exp, refline = 1,
+       ilab.xpos=c(-9.5,-8,-6,-4.5), cex=0.5, 
+       header="Study", 
+       mlab=mlabfun("RE Model", lg.rom_res))
+```
+
+
+**Prediction interval for  RoM**
+
+```{r}
+pred <- predict(lg.rom_res)
+
+pred
+
+
+# predicted interval; lower bound in rato scale
+exp(pred$pi.lb)
+# predicted interval; upper bound in rato scale
+exp(pred$pi.ub)
+```
+
+
